@@ -14,9 +14,9 @@ const sideDrawer = (props) => {
   return (
   	<Auxiliary>
   		<Backdrop show={props.open} backdropClicked={props.closed}/>
-	    <div className={attachedClasses.join(' ')}>
+	    <div className={attachedClasses.join(' ')} onClick={props.closed}>
 	    	<div className={classes.Logo}><Logo/></div>
-	    	<nav><NavigationItems/></nav>
+	    	<nav><NavigationItems isAuth={props.isAuth}/></nav>
 	    </div>
     </Auxiliary>
   )

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import Button from '../../../components/UI/Button/Button';
 import classes from './ContactData.module.css';
 import Spinner from '../../../components/UI/Spinner/Spinner';
+import { updateObject, checkInputValidity } from '../../../shared/utility';
 import axios from '../../../axios-orders';
 import Input from '../../../components/UI/Input/Input';
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
@@ -97,14 +98,16 @@ class ContactData extends React.Component {
 		}
 	}
 
-	inputChangedHanler = (event, inputIdentifier) => {
-		const updatedOrderForm = {...this.state.orderForm};
-		const updatedOrderEl = {...updatedOrderForm[inputIdentifier]}
+	inputChangedHanler = (event, inputIdentifier) => {		
+		const updatedOrderEl = updateObject(this.state.orderForm[inputIdentifier],{
+			value : event.target.value,
+			valid : checkInputValidity(event.target.value, this.state.orderForm[inputIdentifier].validation),
+			touched : true
+		})
 
-		updatedOrderEl.value = event.target.value;
-		updatedOrderEl.valid = this.checkInputValidity(updatedOrderEl.value,updatedOrderEl.validation);
-		updatedOrderEl.touched = true;
-		updatedOrderForm[inputIdentifier] = updatedOrderEl;
+		const updatedOrderForm = updateObject(this.state.orderForm,{
+			[inputIdentifier] :  updatedOrderEl
+		})
 
 		let formIsValid = true;
 		for(let inputIdentifier in updatedOrderForm){
@@ -114,23 +117,6 @@ class ContactData extends React.Component {
 			orderForm: updatedOrderForm,
 			formIsValid: formIsValid
 		});
-	}
-
-	checkInputValidity(value, rules){
-		let isValid = true;
-		if(!rules){
-			return true
-		}
-		if(rules.required){
-			isValid = value.trim() !== "" && isValid;
-		}
-		if(rules.minLength){
-			isValid = value.length >= rules.minLength && isValid;
-		}
-		if(rules.maxLength){
-			isValid = value.length <= rules.maxLength && isValid;
-		}
-		return isValid;
 	}
 
 	orderHandler = (event) => {
@@ -143,10 +129,11 @@ class ContactData extends React.Component {
 		const order = {
 			ingredients: this.props.ings,
 			price: this.props.price,
-			orderData: FormData
+			orderData: FormData,
+			userId: this.props.userId
 		}
 
-		this.props.onPurchaseBurger(order);
+		this.props.onPurchaseBurger(order, this.props.token);
 	}
 
 	render() {
@@ -189,13 +176,15 @@ const mapStateToProps = (state) => {
 	return{
 		ings : state.burgerBuilder.ingredients,
 		price : state.burgerBuilder.price,
-		loading: state.order.loading
+		loading: state.order.loading,
+		token: state.auth.token,
+		userId: state.auth.userId
 	}
 }
 
 const mapDispatchToProps = (dispatch) => {
 	return{
-		onPurchaseBurger : (orderData) => dispatch(actions.purchaseBurger(orderData))
+		onPurchaseBurger : (orderData,token) => dispatch(actions.purchaseBurger(orderData,token))
 	}
 }
 
