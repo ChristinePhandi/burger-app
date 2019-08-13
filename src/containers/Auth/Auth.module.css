@@ -14,3 +14,9 @@
 		width: 500px;
 	}
 }
+
+.title{
+	color: black;
+	font-weight: bold;
+	font-size: 20px; 
+}

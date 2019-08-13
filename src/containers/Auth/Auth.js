@@ -116,16 +116,17 @@ class Auth extends React.Component {
 		return (
 			<div className={classes.Auth}>
 				{authRedirect}
-				{errorMessage}
+				{this.state.isSignUp ? <p className={classes.title}>REGISTER</p> : <p className={classes.title}>SIGN IN</p>}
 				<form onSubmit={this.formSubmitHandler}>
 					{form}
 					<Button btnType="Success" >SUBMIT</Button>
 				</form>
 				<Button 
-						clicked={this.switchAuthModeHandler}
-						btnType="Danger" >
-						{this.state.isSignUp ? 'SIGN IN' : 'SIGN UP'}
-					</Button>
+					clicked={this.switchAuthModeHandler}
+					btnType="Danger" >
+					SWITCH TO {this.state.isSignUp ? 'SIGN IN' : 'REGISTER'}
+				</Button>
+				{errorMessage}
 			</div>
 		);
 	}
